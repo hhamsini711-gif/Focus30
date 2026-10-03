@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Focus 30 — Study Room</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#17243a;--muted:#68758b;--accent:#536dfe;--soft:#edf0ff;--green:#1d9b70}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+header{padding:22px max(20px,calc((100% - 1000px)/2));display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #e8edf5}
+.brand{font-weight:800;font-size:21px;letter-spacing:-.5px}.brand span{color:var(--accent)}.tag{color:var(--muted);font-size:13px}
+main{max-width:1000px;margin:30px auto;padding:0 18px;display:grid;grid-template-columns:250px 1fr;gap:20px}
+.card{background:var(--card);border:1px solid #e7ebf3;border-radius:20px;padding:22px;box-shadow:0 8px 30px #20365c0a}
+h2{font-size:16px;margin:0 0 16px}.subjects{display:grid;gap:9px}.subject{border:1px solid #e8ecf4;background:#fff;border-radius:12px;padding:12px;text-align:left;font:inherit;color:var(--ink);cursor:pointer}.subject.active{border-color:var(--accent);background:var(--soft);color:#3449d8;font-weight:700}
+.center{text-align:center}.label{font-size:13px;color:var(--muted);margin-top:4px}.clock{font-size:76px;line-height:1.25;font-weight:750;letter-spacing:-3px;margin:15px 0 5px;font-variant-numeric:tabular-nums}.progress{height:8px;background:#edf0f6;border-radius:20px;overflow:hidden;margin:20px 0}.bar{height:100%;width:0;background:var(--accent);transition:width .3s}
+button{cursor:pointer}.primary{background:var(--accent);color:white;border:0;border-radius:12px;padding:12px 23px;font-weight:700;font-size:14px}.secondary{background:#f1f3f8;color:var(--ink);border:0;border-radius:12px;padding:12px 18px;font-weight:650}.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.quote{margin:23px auto 0;padding:16px;background:#f8f9ff;border-radius:14px;max-width:560px;min-height:74px}.quote small{display:block;color:var(--accent);font-weight:750;margin-bottom:5px}.quote p{margin:0;font-size:15px;font-weight:600}
+.monitor{display:flex;align-items:center;gap:10px;background:#f8fafc;border-radius:12px;padding:12px;margin:15px 0;text-align:left}.dot{width:10px;height:10px;border-radius:50%;background:#aab3c2}.dot.on{background:var(--green);box-shadow:0 0 0 4px #1d9b7020}.status{font-size:13px;color:var(--muted)}.hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}.bottom{grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:650px){main{grid-template-columns:1fr;margin:18px auto}.subjects{grid-template-columns:repeat(2,minmax(0,1fr))}.clock{font-size:64px}.bottom{grid-column:auto}header{padding:18px}}
+</style></head>
+<body>
+<header><div class="brand">✦ Focus <span>30</span></div><div class="tag">Your quiet study companion</div></header>
+<main>
+<aside class="card"><h2>Choose a subject</h2><div class="subjects" id="subjects"></div><p class="hint">Choose what you're studying. The reading monitor works with the selected subject.</p></aside>
+<section class="card center">
+<div class="label">POMODORO STUDY CYCLE</div><h2 id="current" style="font-size:20px;margin:5px 0 0">Hindi</h2>
+<div class="clock" id="clock">30:00</div><div class="label" id="timerLabel">Ready when you are</div><div class="label" id="cycleLabel" style="margin-top:5px">Study 30 min · Break 5 min · Repeat</div><div class="progress"><div class="bar" id="bar"></div></div>
+<div class="controls"><button type="button" class="primary" id="start">Start 30 min</button><button type="button" class="secondary" id="reset">Reset</button></div>
+<div class="monitor"><span class="dot" id="dot"></span><div><strong style="font-size:13px">Reading monitor</strong><div class="status" id="status">Microphone is off</div></div><button type="button" class="secondary" id="mic" style="margin-left:auto;padding:8px 11px">Enable mic</button></div>
+<div class="quote"><small>✦ MOTIVATION <span id="quoteTime">· Every 5 minutes</span></small><p id="quote">“Small steps every day lead to big results.”</p><div class="controls" style="margin-top:10px"><button type="button" class="secondary" id="langEn" style="padding:7px 12px">English</button><button type="button" class="secondary" id="langHi" style="padding:7px 12px">हिन्दी</button></div></div>
+<p class="hint">When enabled, your browser checks for speech activity. If it hears no speech for 1 minute, it will remind you. Microphone access stays in your browser; speech is not transcribed or saved.</p>
+</section>
+<section class="card" style="grid-column:1/-1">
+<h2>🏆 English & Hindi Question Streak</h2>
+<p class="hint">Choose English or Hindi, select the next unlocked level, then mark it complete after finishing the question. Progress is saved on this device.</p>
+<div class="controls" style="justify-content:flex-start;margin:12px 0"><button type="button" class="secondary" id="trackEn">🇬🇧 English</button><button type="button" class="secondary" id="trackHi">🇮🇳 हिन्दी</button></div>
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0">
+<div class="monitor" style="flex:1;min-width:130px"><div><strong id="doneCount" style="font-size:24px">0</strong><div class="status">Questions completed</div></div></div>
+<div class="monitor" style="flex:1;min-width:130px"><div><strong id="streakCount" style="font-size:24px">0 🔥</strong><div class="status">Current streak</div></div></div>
+<div class="monitor" style="flex:1;min-width:130px"><div><strong id="levelCount" style="font-size:24px">Level 1</strong><div class="status">Next level</div></div></div></div>
+<div id="levels" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:7px;max-height:220px;overflow:auto;padding:3px"></div>
+<div class="controls" style="justify-content:flex-start;margin-top:14px"><button type="button" class="primary" id="completeQuestion">✓ Mark question complete</button><button type="button" class="secondary" id="resetTracker">Reset this subject</button></div>
+<p class="hint" id="completionCode" aria-live="polite">Finish a level to receive its completion code.</p>
+</section>
+<div id="celebration" style="display:none;position:fixed;inset:0;background:#10182dcc;z-index:5;align-items:center;justify-content:center;padding:20px"><div style="background:white;border-radius:22px;padding:30px;text-align:center;max-width:420px;width:100%"><div style="font-size:52px" id="celebrateIcon">🎉</div><h2 id="celebrateTitle" style="font-size:25px">Milestone!</h2><p id="celebrateText">Amazing progress!</p><button type="button" class="primary" id="closeCelebration">Continue</button><div style="font-size:22px;margin-top:12px">🎊 ✨ 🎉 🎆 🎊</div></div></div>
+<div class="bottom">Tip: Keep your device volume on so you can hear reminders.</div>
+</main>
+<script>
+const subjects=['Hindi','English','Social Science','Science','Maths'];
+let selected='Hindi',remaining=1800,interval=null,micStream=null,audioCtx=null,analyser=null,micLoop=null,lastSpeech=Date.now(),lastQuote=0,recognition=null,phase='study',cycle=1;
+const quotes={
+en:['Small steps every day lead to big results.','Focus on progress, not perfection.','Every page you read is a step forward.','You are building your future, one session at a time.','Consistency turns effort into achievement.','Keep going. Your effort matters.','Believe in your ability to learn.','Your hard work today is an investment in tomorrow.','One focused session can make a difference.','Mistakes are proof that you are trying.','You do not have to be perfect; just keep improving.','Take a breath, focus, and begin again.','Your goals are worth your effort.','A little progress is still progress.','Stay curious and keep asking questions.','You are stronger than a moment of distraction.','Every problem you solve builds confidence.','Your future self will thank you for today’s effort.','Keep your attention on the next small step.','Learning takes time; give yourself that time.','You can do difficult things one step at a time.','Be patient with yourself and persistent with your goals.','Start where you are, and use what you have.','Your effort matters, even when progress feels slow.','Read with focus; remember with practice.','You are here to learn, and that is a great start.','Keep showing up for your dreams.','A calm mind and steady effort go a long way.','Finish this session with pride in your effort.','Every minute of focused learning adds up.'],
+hi:['हर दिन की छोटी कोशिश बड़ी सफलता बन सकती है।','पूर्णता नहीं, प्रगति पर ध्यान दो।','हर पढ़ा हुआ पन्ना तुम्हें आगे बढ़ाता है।','आज की मेहनत तुम्हारे कल को बेहतर बना सकती है।','लगातार प्रयास ही सफलता की राह बनाते हैं।','हिम्मत रखो, तुम्हारी कोशिश मायने रखती है।','खुद पर और सीखने की अपनी क्षमता पर विश्वास रखो।','आज की मेहनत कल तुम्हारे काम आएगी।','एकाग्र होकर पढ़ा गया एक सत्र भी बदलाव ला सकता है।','गलतियाँ बताती हैं कि तुम प्रयास कर रहे हो।','परफेक्ट होना जरूरी नहीं, हर दिन बेहतर बनना जरूरी है।','गहरी साँस लो, ध्यान लगाओ और फिर से शुरू करो।','तुम्हारे लक्ष्य तुम्हारी मेहनत के योग्य हैं।','थोड़ी-सी प्रगति भी प्रगति है।','जिज्ञासु बने रहो और सवाल पूछते रहो।','ध्यान भटकने पर फिर से पढ़ाई पर लौट आओ।','हर हल किया हुआ सवाल आत्मविश्वास बढ़ाता है।','आज की मेहनत के लिए तुम्हारा भविष्य तुम्हें धन्यवाद देगा।','अभी बस अगले छोटे कदम पर ध्यान दो।','सीखने में समय लगता है, खुद को समय दो।','तुम एक-एक कदम करके कठिन काम भी कर सकते हो।','अपने साथ धैर्य रखो और लक्ष्य के लिए लगातार प्रयास करो।','जहाँ हो, वहीं से शुरुआत करो।','धीमी प्रगति में भी तुम्हारी मेहनत शामिल है।','ध्यान से पढ़ो और अभ्यास से याद रखो।','सीखने की शुरुआत करना ही एक अच्छी बात है।','अपने सपनों के लिए हर दिन प्रयास करते रहो।','शांत मन और नियमित मेहनत बहुत कुछ कर सकती है।','इस सत्र को अपनी मेहनत पर गर्व के साथ पूरा करो।','एकाग्रता से बिताया हर मिनट तुम्हें आगे बढ़ाता है।']};
+const $=id=>document.getElementById(id);
+let quoteLang='en',quoteIndex=0;
+let trackerLang='en',selectedLevel=1;
+const milestones=[1,5,10,20,50,100];
+let progress={};try{progress=JSON.parse(localStorage.getItem('focus30-progress')||'{}')}catch(e){}
+function subjectProgress(){if(!progress[trackerLang])progress[trackerLang]={done:[]};return progress[trackerLang]}
+function saveProgress(){localStorage.setItem('focus30-progress',JSON.stringify(progress))}
+function renderTracker(){
+ const d=subjectProgress(),done=new Set(d.done||[]);
+ $('doneCount').textContent=done.size;$('streakCount').textContent=done.size+' 🔥';
+ $('levelCount').textContent=done.size>=120?'All done!':'Level '+(done.size+1);
+ $('levels').innerHTML='';
+ for(let i=1;i<=120;i++){let b=document.createElement('button');b.type='button';b.textContent=done.has(i)?'✓ '+i:i;b.className='subject';b.style.cssText='text-align:center;padding:9px 2px;font-size:13px;'+(done.has(i)?'background:#dcfce7;border-color:#1d9b70;color:#166534;':'')+(i===selectedLevel?'outline:2px solid #536dfe;':'');b.disabled=!done.has(i)&&i>done.size+1;if(b.disabled)b.style.opacity='.4';b.onclick=()=>{selectedLevel=i;renderTracker()};$('levels').appendChild(b);}
+ $('completionCode').textContent=done.has(selectedLevel)?'Level '+selectedLevel+' is already completed.':'Selected: Level '+selectedLevel+' · Finish the question, then tap Mark question complete.';
+ $('trackEn').classList.toggle('primary',trackerLang==='en');$('trackEn').classList.toggle('secondary',trackerLang!=='en');$('trackHi').classList.toggle('primary',trackerLang==='hi');$('trackHi').classList.toggle('secondary',trackerLang!=='hi');
+}
+function celebrate(n){$('celebrateIcon').textContent=n>=100?'🎆🎇🎆':n>=50?'🎆🎉🎆':n>=20?'🎉🎊🎉':n>=10?'🎊🎉':n>=5?'🎉✨':'✨';$('celebrateTitle').textContent=n+' question'+(n===1?'':'s')+' streak!';$('celebrateText').textContent=n===100?'Amazing! You reached the 100-question milestone!':n+' questions completed. Keep going!';$('celebration').style.display='flex';if('speechSynthesis'in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(n+' questions completed. Great work!'));}}
+$('trackEn').onclick=()=>{trackerLang='en';selectedLevel=subjectProgress().done.length+1;renderTracker()};
+$('trackHi').onclick=()=>{trackerLang='hi';selectedLevel=subjectProgress().done.length+1;renderTracker()};
+$('completeQuestion').onclick=()=>{let d=subjectProgress();d.done=d.done||[];if(d.done.includes(selectedLevel)){ $('completionCode').textContent='This level is already complete. Choose the next unlocked level.';return;}if(selectedLevel!==d.done.length+1){$('completionCode').textContent='Please finish the next unlocked level first.';return;}d.done.push(selectedLevel);saveProgress();let code='F30-'+trackerLang.toUpperCase()+'-'+String(selectedLevel).padStart(3,'0')+'-'+Math.random().toString(36).slice(2,7).toUpperCase();renderTracker();$('completionCode').textContent='Completed Level '+selectedLevel+'! Your code: '+code;if(milestones.includes(d.done.length))celebrate(d.done.length);selectedLevel=Math.min(120,d.done.length+1);renderTracker();$('completionCode').textContent='Completed Level '+(d.done.length)+'! Your code: '+code;};
+$('resetTracker').onclick=()=>{if(confirm('Reset completed levels and streak for this subject?')){progress[trackerLang]={done:[]};selectedLevel=1;saveProgress();renderTracker()}};
+$('closeCelebration').onclick=()=>$('celebration').style.display='none';
+
+function showQuote(){let list=quotes[quoteLang];$('quote').textContent='“'+list[quoteIndex%list.length]+'”';}
+function speakQuote(){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();let utter=new SpeechSynthesisUtterance(quotes[quoteLang][quoteIndex%quotes[quoteLang].length]);utter.lang=quoteLang==='hi'?'hi-IN':'en-IN';utter.rate=0.92;speechSynthesis.speak(utter);}
+$('langEn').onclick=()=>{quoteLang='en';showQuote();};
+$('langHi').onclick=()=>{quoteLang='hi';showQuote();};
+renderTracker();
+subjects.forEach(s=>{let b=document.createElement('button');b.className='subject'+(s===selected?' active':'');b.textContent=s;b.onclick=()=>{selected=s;$('current').textContent=s;document.querySelectorAll('.subject').forEach(x=>x.classList.toggle('active',x.textContent===s));};$('subjects').appendChild(b)});
+function paint(){$('clock').textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');$('bar').style.width=((phase==='study'?1800-remaining:300-remaining)/(phase==='study'?1800:300)*100)+'%';$('cycleLabel').textContent=phase==='study'?'Study session · Cycle '+cycle:'Break time · Next: 30 min reading';}
+function tick(){if(remaining>0){remaining--;paint();if(phase==='study'){let elapsed=1800-remaining;if(elapsed>0&&elapsed%300===0){quoteIndex++;showQuote();$('quoteTime').textContent='· '+(elapsed/60)+' min';speakQuote();}}if(remaining===0){beep();if(phase==='study'){phase='break';remaining=300;$('timerLabel').textContent='Great work! Take a 5-minute break.';if('speechSynthesis'in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance('Thirty minutes complete. Take a five minute break.'));}}else{phase='study';cycle++;remaining=1800;$('timerLabel').textContent='Break finished. Time to study again!';quoteIndex++;showQuote();$('quoteTime').textContent='· Cycle '+cycle;if('speechSynthesis'in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance('Break finished. Start your next thirty minute study session.');u.onend=()=>speakQuote();speechSynthesis.speak(u);}}paint();}}}
+$('start').onclick=()=>{if(interval){clearInterval(interval);interval=null;$('start').textContent='Resume';$('timerLabel').textContent='Paused';}else{if(remaining===1800)$('timerLabel').textContent='Stay focused — you’ve got this!';interval=setInterval(tick,1000);$('start').textContent='Pause';}};
+$('reset').onclick=()=>{clearInterval(interval);interval=null;remaining=1800;phase='study';cycle=1;paint();$('start').textContent='Start 30 min';$('timerLabel').textContent='Ready when you are';quoteIndex=0;showQuote();$('quoteTime').textContent='· Every 5 minutes';};
+function beep(){try{let c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=.12;o.start();o.stop(c.currentTime+.35)}catch(e){}}
+function remind(){if('speechSynthesis'in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance('Keep reading, you can do it!'));}else alert('Keep reading, you can do it!');}
+$('mic').onclick=async()=>{if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;clearInterval(micLoop);$('dot').classList.remove('on');$('status').textContent='Microphone is off';$('mic').textContent='Enable mic';return;}
+try{if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('Microphone needs a secure browser page. Open this file in Chrome or host it on HTTPS.');micStream=await navigator.mediaDevices.getUserMedia({audio:true});audioCtx=new (window.AudioContext||window.webkitAudioContext)();let src=audioCtx.createMediaStreamSource(micStream);analyser=audioCtx.createAnalyser();analyser.fftSize=512;src.connect(analyser);lastSpeech=Date.now();$('dot').classList.add('on');$('status').textContent='Listening for reading activity';$('mic').textContent='Turn off';let data=new Uint8Array(analyser.fftSize);micLoop=setInterval(()=>{analyser.getByteTimeDomainData(data);let sum=0;for(let x of data){let v=(x-128)/128;sum+=v*v;}let rms=Math.sqrt(sum/data.length);if(rms>.035)lastSpeech=Date.now();if(Date.now()-lastSpeech>60000){remind();lastSpeech=Date.now();}},500);}catch(e){$('status').textContent=e.message||'Microphone permission denied or unavailable';}}
+</script></body></html>
